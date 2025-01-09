@@ -1,0 +1,98 @@
+
+
+
+       Imports MySql.Data.MySqlClient
+Public Class Form1
+    Dim connectionString As String = "Server=localhost;Database=studentdb;Uid=root;Pwd=Xabc5555777@;"
+    Dim connection As New MySqlConnection(connectionString)
+
+    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        LoadData()
+    End Sub
+    Private Sub LoadData()
+        Try
+            connection.Open()
+            Dim query As String = "SELECT * FROM students"
+            Dim adapter As New MySqlDataAdapter(query, connection)
+            Dim table As New DataTable()
+            adapter.Fill(table)
+            DataGridView1.DataSource = table
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        Finally
+            connection.Close()
+        End Try
+    End Sub
+
+    Private Sub btnInsert_Click(sender As Object, e As EventArgs) Handles btnInsert.Click
+        Try
+            connection.Open()
+            Dim query As String = "INSERT INTO students (Student_ID, Student_Name, Course, Enroll_Date) VALUES (@Student_ID, @Student_Name, @Course, @Enroll_Date)"
+            Dim command As New MySqlCommand(query, connection)
+            command.Parameters.AddWithValue("@Student_ID", TextBox1.Text)
+            command.Parameters.AddWithValue("@Student_Name", TextBox2.Text)
+            command.Parameters.AddWithValue("@Course", TextBox3.Text)
+            command.Parameters.AddWithValue("@Enroll_Date", DateTimePicker1.Value)
+            command.ExecuteNonQuery()
+            MessageBox.Show("Record inserted succesfully!")
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        Finally
+            connection.Close()
+            LoadData()
+        End Try
+
+
+    End Sub
+
+    Private Sub btnUpdate_Click(sender As Object, e As EventArgs) Handles btnUpdate.Click
+        Try
+            connection.Open()
+            Dim query As String = "UPDATE students SET Student_Name=@Student_Name, Course=@Course, Enroll_Date=@Enroll_Date WHERE Student_ID=@Student_ID"
+            Dim command As New MySqlCommand(query, connection)
+            command.Parameters.AddWithValue("@Student_ID", TextBox1.Text)
+            command.Parameters.AddWithValue("@Student_Name", TextBox2.Text)
+            command.Parameters.AddWithValue("@Course", TextBox3.Text)
+            command.Parameters.AddWithValue("@Enroll_Date", DateTimePicker1.Value)
+            command.ExecuteNonQuery()
+            MessageBox.Show("Record updated succesfully!")
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        Finally
+            connection.Close()
+            LoadData()
+        End Try
+    End Sub
+
+    Private Sub btnDelete_Click(sender As Object, e As EventArgs) Handles btnDelete.Click
+        Try
+            connection.Open()
+            Dim query As String = "DELETE FROM students WHERE Student_ID=@Student_ID"
+            Dim command As New MySqlCommand(query, connection)
+            command.Parameters.AddWithValue("@Student_ID", TextBox1.Text)
+            command.ExecuteNonQuery()
+            MessageBox.Show("Record deleted succesfully!")
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        Finally
+            connection.Close()
+            LoadData()
+        End Try
+    End Sub
+
+    Private Sub DataGridView1_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellClick
+        If e.RowIndex >= 0 Then
+            Dim row As DataGridViewRow = DataGridView1.Rows(e.RowIndex)
+            TextBox1.Text = row.Cells("Student_ID").Value.ToString()
+            TextBox2.Text = row.Cells("Student_Name").Value.ToString()
+            TextBox3.Text = row.Cells("Course").Value.ToString()
+            DateTimePicker1.Value = row.Cells("Enroll_Date").Value.ToString()
+        End If
+    End Sub
+
+    Private Sub btnNew_Click(sender As Object, e As EventArgs) Handles btnNew.Click
+        TextBox1.Text = ""
+        TextBox2.Text = ""
+        TextBox3.Text = ""
+    End Sub
+End Class
